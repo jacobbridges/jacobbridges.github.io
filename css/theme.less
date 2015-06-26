@@ -88,7 +88,10 @@ img{
 --------------------------------------------------*/
 header{
   padding: 20px 0;
-  margin-bottom: 20px;
+}
+
+header .title-row {
+  margin-bottom: 4px;
 }
 
 header h2{
@@ -121,6 +124,37 @@ header #social li + li{
 header #social li:last-child{
   padding-right: 0;
 }
+
+//----------------------------
+
+header #pages{
+  text-align: left;
+}
+
+header #pages ul{
+  font-size: 0;
+  margin: 0;
+}
+
+header #pages li{
+  display: inline-block;
+  font-size: 12px;
+  padding: 0 10px;
+}
+
+header #pages li:first-child{
+  padding-left: 0;
+}
+
+header #pages li + li{
+  border-left: 1px solid #ccc;
+}
+
+header #pages li:last-child{
+  padding-right: 0;
+}
+
+//----------------------------
 
 @media (max-width: 767px) {
   header h1, header h2{

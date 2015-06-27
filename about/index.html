@@ -80,16 +80,21 @@
 <p>I&rsquo;m a webscraping ninja.</p>
 
 <pre><code class="language-javascript">var $ = cheerio.load(html);
-
-_($(&quot;form :input&quot;))
-  .map(function (input) {
-    return $(input).name;
-  })
-  .filter(function (name) {
-    return name === 'awesome';
-  })
-  .value()
+console.log($('#awesome'));
 </code></pre>
+
+<p>I&rsquo;m a data geek.</p>
+
+<pre><code class="language-python">import plotly.plotly as py
+fig = Figure(data=data, layout=layout)
+# .. graph code ..
+py.plot(fig)
+</code></pre>
+
+<div>
+    <a href="https://plot.ly/~alexhp/61/" target="_blank" title="Space vs. Spaaaaaace" style="display: block; text-align: center;"><img src="https://plot.ly/~alexhp/61.png" alt="Space vs. Spaaaaaace" style="max-width: 100%;width: 770px;"  width="770" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="alexhp:61" src="https://plot.ly/embed.js" async></script>
+</div>
 
     </article>
     

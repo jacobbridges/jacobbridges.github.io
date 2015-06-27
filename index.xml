@@ -10,16 +10,6 @@
     <atom:link href="http://jacobbridges.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>web scraping &#43; queues</title>
-      <link>http://jacobbridges.github.io/post/web-scraping-and-queues/</link>
-      <pubDate>Thu, 25 Jun 2015 00:06:10 -0400</pubDate>
-      
-      <guid>http://jacobbridges.github.io/post/web-scraping-and-queues/</guid>
-      <description>&lt;p&gt;WIP&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
       <title>about</title>
       <link>http://jacobbridges.github.io/about/</link>
       <pubDate>Thu, 25 Jun 2015 00:06:10 -0400</pubDate>
@@ -33,16 +23,31 @@
 &lt;p&gt;I&amp;rsquo;m a webscraping ninja.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var $ = cheerio.load(html);
-
-_($(&amp;quot;form :input&amp;quot;))
-  .map(function (input) {
-    return $(input).name;
-  })
-  .filter(function (name) {
-    return name === &#39;awesome&#39;;
-  })
-  .value()
+console.log($(&#39;#awesome&#39;));
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I&amp;rsquo;m a data geek.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import plotly.plotly as py
+fig = Figure(data=data, layout=layout)
+# .. graph code ..
+py.plot(fig)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div&gt;
+    &lt;a href=&#34;https://plot.ly/~alexhp/61/&#34; target=&#34;_blank&#34; title=&#34;Space vs. Spaaaaaace&#34; style=&#34;display: block; text-align: center;&#34;&gt;&lt;img src=&#34;https://plot.ly/~alexhp/61.png&#34; alt=&#34;Space vs. Spaaaaaace&#34; style=&#34;max-width: 100%;width: 770px;&#34;  width=&#34;770&#34; onerror=&#34;this.onerror=null;this.src=&#39;https://plot.ly/404.png&#39;;&#34; /&gt;&lt;/a&gt;
+    &lt;script data-plotly=&#34;alexhp:61&#34; src=&#34;https://plot.ly/embed.js&#34; async&gt;&lt;/script&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>web scraping &#43; queues</title>
+      <link>http://jacobbridges.github.io/post/web-scraping-and-queues/</link>
+      <pubDate>Thu, 25 Jun 2015 00:06:10 -0400</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/web-scraping-and-queues/</guid>
+      <description>&lt;p&gt;WIP&lt;/p&gt;
 </description>
     </item>
     

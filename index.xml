@@ -142,8 +142,9 @@ q.join()
 
 &lt;h4 id=&#34;threading:ac000825113187d0830002f6bb3abe5b&#34;&gt;Threading&lt;/h4&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://pymotw.com/2/threading/&#34;&gt;PyMOTW threading&lt;/a&gt;
-&lt;a href=&#34;http://lonelycode.com/2011/02/04/python-threading-and-queues-and-why-its-awesome/&#34;&gt;Python Threading and Queues - and why its awesome&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://pymotw.com/2/threading/&#34;&gt;PyMOTW threading&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://lonelycode.com/2011/02/04/python-threading-and-queues-and-why-its-awesome/&#34;&gt;Python Threading and Queues - and why its awesome&lt;/a&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;queues:ac000825113187d0830002f6bb3abe5b&#34;&gt;Queues&lt;/h4&gt;
 

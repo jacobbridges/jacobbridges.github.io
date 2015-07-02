@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  
+  <meta charset="UTF-8">
+  <title>
+    web scraping, threads, and queues | /dev/jacob
+  </title>
+
+
+  
+  <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
+
+
+  
+  <link rel="stylesheet" href="/css/sanitize.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/highlight_gist.css">
+  <link rel="stylesheet/less" href="/css/theme.less">
+  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+
+  
+  <script src="/js/less.js" type="text/javascript"></script>
+
+
+</head>
+
+
+
+<body>
+<div class="container">
+
+  
+  <header role="banner">
+    <div class="row gutters title-row">
+      <div id="site-title" class="col span_6">
+        <h1><a href="/">/dev/jacob</a></h1>
+        
+      </div>
+      <div id="social" class="col span_6">
+        <ul>
+          <li><a href="http://twitter.com/codeweavr" target="_blank"><i class="fa fa-twitter fa-2x"></i></a></li>
+          <li><a href="http://github.com/jacobbridges" target="_blank"><i class="fa fa-github fa-2x"></i></a></li>
+        </ul>
+      </div>
+    </div>
+
+    
+    <div class="row">
+      <div id="pages" class="col span_12">
+        <ul>
+          
+            <li><a href="/about">about</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </header>
+
+
+  
+  <main id="single" role="main">
+    <div class="article-header">
+      <h1>web scraping, threads, and queues</h1>
+      <div class="meta">
+        Jun 25, 2015 &nbsp;
+        
+          #<a href="/tags/python">python</a>&nbsp;
+        
+      </div>
+    </div>
+    <article>
+      
+
+<h3 id="the-problem:ac000825113187d0830002f6bb3abe5b">The Problem</h3>
+
+<pre><code class="language-python">urls = get_urls()  # len(urls) &gt; 5000
+for url in urls:
+    r = requests.get(url)
+    page = pyquery(r.text)
+    data = page(&quot;#data&quot;).text()
+    # do something with data
+</code></pre>
+
+<p>Look familiar? Yeah, this is the &ldquo;quick fix&rdquo; code we toss at the n00bs on Stack Overflow to keep them satisfied. But to be honest up until recently my &ldquo;quick fix&rdquo; scripts looked very similar to this. Of course my code had exception catching, but it still performed the page scrapes linearly.</p>
+
+<p>So in reality my &ldquo;quick script&rdquo; was taking four precious hours to complete. That&rsquo;s not the way a Pythonista should write code!</p>
+
+<h3 id="thread-it:ac000825113187d0830002f6bb3abe5b">Thread It</h3>
+
+<pre><code class="language-python">from threading import Thread
+</code></pre>
+
+<p>The <a href="https://docs.python.org/2/library/threading.html">threading module</a> is a deep well of power&ndash;if you are not familiar with it I suggest you go to the extrenal references section at the bottom of this post. There are some great  posts, my favorite of these being the article by Doug Hellmann at <a href="http://pymotw.com/2/about.html">PyMOTW</a>.</p>
+
+<p>Let&rsquo;s create a simple scraper worker function:</p>
+
+<pre><code class="language-python">def scraper_worker(urls):
+    for url in urls:
+        r = requests.get(url)
+        page = pyquery(r.text)
+        data = page(&quot;#data&quot;).text()
+        # do something with data
+</code></pre>
+
+<p>So we send our new function a list of urls, it scrapes them. Ez-Pz.</p>
+
+<p>Now that we have a worker function, let&rsquo;s create several &ldquo;scraper workers&rdquo; with the threading module.</p>
+
+<pre><code class="language-python"># Create 5 scraper workers
+for i in range(5):
+    t = Thread(target=scraper_worker, args=(urls, ))
+    t.start()
+</code></pre>
+
+<p>See a problem with this? If we start 5 scraper workers and give all of them the full list of urls we want to scrape, each page will be scraped 5 times!</p>
+
+<p>One common way to fix this problem is by slicing the url list into chunks and feeding a different chunk to each worker. The workers will effectively scrape all the pages in <sup>1</sup>&frasl;<sub>5</sub> the original time&ndash;but there is a better way. A more efficient way.</p>
+
+<h3 id="queue-it:ac000825113187d0830002f6bb3abe5b">Queue It</h3>
+
+<pre><code class="language-python">from Queue import Queue
+</code></pre>
+
+<p>The Queue module has several built in queue data types to play with, but for this project I used the standard FIFO Queue.</p>
+
+<p>In Python, queues are thread safe. So we can push all the urls into the queue and share it with all the worker threads.</p>
+
+<pre><code class="language-python">def scraper_worker(q):
+    while not q.empty():
+        url = q.get()
+        r = requests.get(url)
+        page = pyquery(r.text)
+        data = page(&quot;#data&quot;).text()
+        # do something with data
+        q.task_done()
+
+# Create a queue and fill it
+q = Queue()
+map(q.put, urls)
+
+# Create 5 scraper workers
+for i in range(5):
+    t = Thread(target=scraper_worker, args=(q, ))
+    t.start()
+q.join()
+</code></pre>
+
+<p><strong>Important!</strong> The <code>q.join</code> on the last line is very important. It causes the program to wait for the queue to be emptied before exiting.</p>
+
+<h3 id="results:ac000825113187d0830002f6bb3abe5b">Results</h3>
+
+<p>Comparing results is mind blowing. The linear (n00b) scraping method takes over an hour to scrape 5000 pages, and the threaded + queues method takes <em>less than three minutes</em>. *</p>
+
+<p>So by adding a few more lines of code to that &ldquo;quick fix&rdquo; script, you could save hours of development time.</p>
+
+<p>I &lt;3 Python!</p>
+
+<p><sub>* I ran the tests on my local machine, but not posting the actual results because threading relies greatly on the CPU and that differs for each environment.</sub></p>
+
+<hr />
+
+<h3 id="external-references:ac000825113187d0830002f6bb3abe5b">External References</h3>
+
+<h4 id="threading:ac000825113187d0830002f6bb3abe5b">Threading</h4>
+
+<p><a href="http://pymotw.com/2/threading/">PyMOTW threading</a>
+<a href="http://lonelycode.com/2011/02/04/python-threading-and-queues-and-why-its-awesome/">Python Threading and Queues - and why its awesome</a></p>
+
+<h4 id="queues:ac000825113187d0830002f6bb3abe5b">Queues</h4>
+
+<p><a href="http://pymotw.com/2/Queue/">PyMOTW queues</a></p>
+
+    </article>
+    
+
+
+<script type="text/javascript">
+     
+    var disqus_shortname = '';
+
+     
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+  </main>
+
+
+  
+  <footer role="contentinfo">
+    <div style="text-align:center;">
+      <img src="https://pbs.twimg.com/profile_images/549048966071865344/ozB8Xi12_400x400.png" width="64" height="64"><br>
+      
+    </div>
+  </footer>
+
+
+</div>
+
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+</body>
+</html>
+

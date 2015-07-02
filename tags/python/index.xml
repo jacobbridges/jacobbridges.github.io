@@ -10,12 +10,111 @@
     <atom:link href="http://jacobbridges.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>web scraping &#43; queues</title>
-      <link>http://jacobbridges.github.io/post/web-scraping-and-queues/</link>
+      <title>web scraping, threads, and queues</title>
+      <link>http://jacobbridges.github.io/post/web-scraping-threads-and-queues/</link>
       <pubDate>Thu, 25 Jun 2015 00:06:10 -0400</pubDate>
       
-      <guid>http://jacobbridges.github.io/post/web-scraping-and-queues/</guid>
-      <description>&lt;p&gt;WIP&lt;/p&gt;
+      <guid>http://jacobbridges.github.io/post/web-scraping-threads-and-queues/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-problem:ac000825113187d0830002f6bb3abe5b&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;urls = get_urls()  # len(urls) &amp;gt; 5000
+for url in urls:
+    r = requests.get(url)
+    page = pyquery(r.text)
+    data = page(&amp;quot;#data&amp;quot;).text()
+    # do something with data
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Look familiar? Yeah, this is the &amp;ldquo;quick fix&amp;rdquo; code we toss at the n00bs on Stack Overflow to keep them satisfied. But to be honest up until recently my &amp;ldquo;quick fix&amp;rdquo; scripts looked very similar to this. Of course my code had exception catching, but it still performed the page scrapes linearly.&lt;/p&gt;
+
+&lt;p&gt;So in reality my &amp;ldquo;quick script&amp;rdquo; was taking four precious hours to complete. That&amp;rsquo;s not the way a Pythonista should write code!&lt;/p&gt;
+
+&lt;h3 id=&#34;thread-it:ac000825113187d0830002f6bb3abe5b&#34;&gt;Thread It&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from threading import Thread
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://docs.python.org/2/library/threading.html&#34;&gt;threading module&lt;/a&gt; is a deep well of power&amp;ndash;if you are not familiar with it I suggest you go to the extrenal references section at the bottom of this post. There are some great  posts, my favorite of these being the article by Doug Hellmann at &lt;a href=&#34;http://pymotw.com/2/about.html&#34;&gt;PyMOTW&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a simple scraper worker function:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def scraper_worker(urls):
+    for url in urls:
+        r = requests.get(url)
+        page = pyquery(r.text)
+        data = page(&amp;quot;#data&amp;quot;).text()
+        # do something with data
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So we send our new function a list of urls, it scrapes them. Ez-Pz.&lt;/p&gt;
+
+&lt;p&gt;Now that we have a worker function, let&amp;rsquo;s create several &amp;ldquo;scraper workers&amp;rdquo; with the threading module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# Create 5 scraper workers
+for i in range(5):
+    t = Thread(target=scraper_worker, args=(urls, ))
+    t.start()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See a problem with this? If we start 5 scraper workers and give all of them the full list of urls we want to scrape, each page will be scraped 5 times!&lt;/p&gt;
+
+&lt;p&gt;One common way to fix this problem is by slicing the url list into chunks and feeding a different chunk to each worker. The workers will effectively scrape all the pages in &lt;sup&gt;1&lt;/sup&gt;&amp;frasl;&lt;sub&gt;5&lt;/sub&gt; the original time&amp;ndash;but there is a better way. A more efficient way.&lt;/p&gt;
+
+&lt;h3 id=&#34;queue-it:ac000825113187d0830002f6bb3abe5b&#34;&gt;Queue It&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from Queue import Queue
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The Queue module has several built in queue data types to play with, but for this project I used the standard FIFO Queue.&lt;/p&gt;
+
+&lt;p&gt;In Python, queues are thread safe. So we can push all the urls into the queue and share it with all the worker threads.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def scraper_worker(q):
+    while not q.empty():
+        url = q.get()
+        r = requests.get(url)
+        page = pyquery(r.text)
+        data = page(&amp;quot;#data&amp;quot;).text()
+        # do something with data
+        q.task_done()
+
+# Create a queue and fill it
+q = Queue()
+map(q.put, urls)
+
+# Create 5 scraper workers
+for i in range(5):
+    t = Thread(target=scraper_worker, args=(q, ))
+    t.start()
+q.join()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Important!&lt;/strong&gt; The &lt;code&gt;q.join&lt;/code&gt; on the last line is very important. It causes the program to wait for the queue to be emptied before exiting.&lt;/p&gt;
+
+&lt;h3 id=&#34;results:ac000825113187d0830002f6bb3abe5b&#34;&gt;Results&lt;/h3&gt;
+
+&lt;p&gt;Comparing results is mind blowing. The linear (n00b) scraping method takes over an hour to scrape 5000 pages, and the threaded + queues method takes &lt;em&gt;less than three minutes&lt;/em&gt;. *&lt;/p&gt;
+
+&lt;p&gt;So by adding a few more lines of code to that &amp;ldquo;quick fix&amp;rdquo; script, you could save hours of development time.&lt;/p&gt;
+
+&lt;p&gt;I &amp;lt;3 Python!&lt;/p&gt;
+
+&lt;p&gt;&lt;sub&gt;* I ran the tests on my local machine, but not posting the actual results because threading relies greatly on the CPU and that differs for each environment.&lt;/sub&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;external-references:ac000825113187d0830002f6bb3abe5b&#34;&gt;External References&lt;/h3&gt;
+
+&lt;h4 id=&#34;threading:ac000825113187d0830002f6bb3abe5b&#34;&gt;Threading&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://pymotw.com/2/threading/&#34;&gt;PyMOTW threading&lt;/a&gt;
+&lt;a href=&#34;http://lonelycode.com/2011/02/04/python-threading-and-queues-and-why-its-awesome/&#34;&gt;Python Threading and Queues - and why its awesome&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;queues:ac000825113187d0830002f6bb3abe5b&#34;&gt;Queues&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://pymotw.com/2/Queue/&#34;&gt;PyMOTW queues&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

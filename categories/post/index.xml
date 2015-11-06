@@ -27,9 +27,9 @@ for url in urls:
     # do something with data
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Look familiar? This is the &amp;ldquo;quick fix&amp;rdquo; code we toss at the n00bs on Stack Overflow to keep them satisfied. But to be honest up until recently my &amp;ldquo;quick fix&amp;rdquo; scripts looked very similar to this. Of course my code had exception catching, but it still performed the page scrapes linearly.&lt;/p&gt;
+&lt;p&gt;Look familiar? This was my normal &amp;ldquo;quick fix&amp;rdquo; web scraping script in Python. You may prefer BeautifulSoup to PyQuery, but from all the StackOverflow questions I have read this bit of &amp;ldquo;quick fix&amp;rdquo; scraper code is very common.&lt;/p&gt;
 
-&lt;p&gt;So in reality my &amp;ldquo;quick script&amp;rdquo; was taking four precious hours to complete. That&amp;rsquo;s not the way a Pythonista should write code!&lt;/p&gt;
+&lt;p&gt;The problem is that code will take almost 4 hours to complete. By continuing to publish code like this, we are furthering the stereotype that Python is slow. By using a few extra lines of code, I will show you how to take that 4 hours and cut it down to less than 5 minutes.&lt;/p&gt;
 
 &lt;h3 id=&#34;thread-it:ac000825113187d0830002f6bb3abe5b&#34;&gt;Thread It&lt;/h3&gt;
 
@@ -97,7 +97,7 @@ q.join()
 
 &lt;p&gt;Comparing results is mind blowing. The linear (n00b) scraping method takes over an hour to scrape 5000 pages, and the threaded + queues method takes &lt;em&gt;less than three minutes&lt;/em&gt;. *&lt;/p&gt;
 
-&lt;p&gt;So by adding a few more lines of code to that &amp;ldquo;quick fix&amp;rdquo; script, you could save hours of development time.&lt;/p&gt;
+&lt;p&gt;So by adding a few more lines of code to that &amp;ldquo;quick fix&amp;rdquo; script, you could save hours of execution time.&lt;/p&gt;
 
 &lt;p&gt;I &amp;lt;3 Python!&lt;/p&gt;
 

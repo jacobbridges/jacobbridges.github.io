@@ -22,8 +22,11 @@
 
 &lt;p&gt;I&amp;rsquo;m a webscraping ninja.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var $ = cheerio.load(html);
-console.log($(&#39;#awesome&#39;));
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from bs4 import BeautifulSoup
+import requests
+import scrapy
+
+# Something awesome
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;I&amp;rsquo;m a data geek.&lt;/p&gt;

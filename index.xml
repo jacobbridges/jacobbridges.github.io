@@ -6,8 +6,51 @@
     <description>Recent content on /dev/jacob</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 01 Jul 2015 00:06:10 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 20 May 2016 21:03:05 -0400</lastBuildDate>
     <atom:link href="http://jacobbridges.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>django tag for placeholder.it</title>
+      <link>http://jacobbridges.github.io/post/custom-django-tag-placeholder-images/</link>
+      <pubDate>Fri, 20 May 2016 21:03:05 -0400</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/custom-django-tag-placeholder-images/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-problem:16fdfe957b9f77d5d8be427e73689e99&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;p&gt;In the past few weeks I have been using Django to build a website for my local church. The project&amp;rsquo;s early conception required rapid prototyping of the UI, and I found myself using &lt;a href=&#34;http://placehold.it&#34;&gt;placeholder images&lt;/a&gt; in many places.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;img src=&amp;quot;http://placehold.it/350x150&amp;quot;&amp;gt;&amp;lt;/img&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;a-custom-tag:16fdfe957b9f77d5d8be427e73689e99&#34;&gt;A Custom Tag&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# project/app/templatetags/webextras.py
+from django import template
+
+register = template.Library()
+
+@register.simple_tag
+def fake_img(width, height):
+    return &#39;https://placehold.it/{}x{}&#39;.format(width, height)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For more info on custom tags, read the &lt;a href=&#34;https://docs.djangoproject.com/en/1.8/howto/custom-template-tags/&#34;&gt;Django docs&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now, to use the new tag in my templates:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- At top of template --&amp;gt;
+{% load fake_img from webextras %}
+
+&amp;lt;!-- ... --&amp;gt;
+
+&amp;lt;img src=&amp;quot;{% fake_img 350 150 %}&amp;quot;&amp;gt;&amp;lt;/img&amp;gt;
+&amp;lt;!-- Easily replaced with a static method call later. --&amp;gt;
+&amp;lt;img src=&amp;quot;{% static &#39;logo.png&#39; %}&amp;quot;&amp;gt;&amp;lt;/img&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>web scraping, threads, and queues</title>

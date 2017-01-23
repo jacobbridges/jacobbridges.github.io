@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Time on /dev/jacob</title>
+    <link>http://jacobbridges.github.io/tags/time/index.xml</link>
+    <description>Recent content in Time on /dev/jacob</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="http://jacobbridges.github.io/tags/time/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>how many seconds until midnight?</title>
+      <link>http://jacobbridges.github.io/post/how-many-seconds-until-midnight/</link>
+      <pubDate>Sun, 22 Jan 2017 21:19:31 -0600</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/how-many-seconds-until-midnight/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/sivh5Fe.jpg&#34;&gt;&lt;/img&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;A countdown of victims that will end at midnight unless our dear Dark Knight stops me first!&amp;rdquo;
+- &lt;strong&gt;Joker&lt;/strong&gt; in &lt;a href=&#34;http://www.imdb.com/title/tt0519694/&#34;&gt;&lt;em&gt;Holiday Knights&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Imagine you need to know the number of seconds from now until midnight. It could help Batman save Gotham. It could also help a web developer (like me) cache some data in Redis that should self-destruct at the end of the day. How would you do it?&lt;/p&gt;
+
+&lt;h3 id=&#34;my-solution&#34;&gt;My Solution&lt;/h3&gt;
+
+&lt;p&gt;As always, I turn to Python. But it doesn&amp;rsquo;t solve my problem instantly. Python has many ways to deal with date math &amp;ndash; should I use &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#datetime-objects&#34;&gt;datetime&lt;/a&gt;? &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#date-objects&#34;&gt;date&lt;/a&gt;? &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#time-objects&#34;&gt;time&lt;/a&gt;? &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#timedelta-objects&#34;&gt;timedelta&lt;/a&gt;? An external library like &lt;a href=&#34;https://dateutil.readthedocs.io/en/stable/&#34;&gt;dateutil&lt;/a&gt;?&lt;/p&gt;
+
+&lt;p&gt;Well, for best readability, I decided on a mixture that is pure Python with no external modules:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from datetime import datetime, timedelta
+
+def how_many_seconds_until_midnight():
+    &amp;quot;&amp;quot;&amp;quot;Get the number of seconds until midnight.&amp;quot;&amp;quot;&amp;quot;
+    tomorrow = datetime.now() + timedelta(1)
+    midnight = datetime(year=tomorrow.year, month=tomorrow.month, 
+                        day=tomorrow.day, hour=0, minute=0, second=0)
+    return (midnight - datetime.now()).seconds
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Or, if you want to remove the timedelta dependency and just use math:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from datetime import datetime
+
+def how_many_seconds_until_midnight():
+    &amp;quot;&amp;quot;&amp;quot;Get the number of seconds until midnight.&amp;quot;&amp;quot;&amp;quot;
+    n = datetime.now()
+    return ((24 - n.hour - 1) * 60 * 60) + ((60 - n.minute - 1) * 60) + (60 - n.second)
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

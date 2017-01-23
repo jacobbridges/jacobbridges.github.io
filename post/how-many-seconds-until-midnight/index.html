@@ -6,7 +6,7 @@
   
   <meta charset="UTF-8">
   <title>
-    django tag for placeholder.it | /dev/jacob
+    how many seconds until midnight? | /dev/jacob
   </title>
 
 
@@ -65,13 +65,15 @@
   
   <main id="single" role="main">
     <div class="article-header">
-      <h1>django tag for placeholder.it</h1>
+      <h1>how many seconds until midnight?</h1>
       <div class="meta">
-        May 20, 2016 &nbsp;
+        Jan 22, 2017 &nbsp;
         
           #<a href="/tags/python">python</a>&nbsp;
         
-          #<a href="/tags/django">django</a>&nbsp;
+          #<a href="/tags/time">time</a>&nbsp;
+        
+          #<a href="/tags/batman">batman</a>&nbsp;
         
       </div>
     </div>
@@ -80,35 +82,39 @@
 
 <h3 id="the-problem">The Problem</h3>
 
-<p>In the past few weeks I have been using Django to build a website for my local church. The project&rsquo;s early conception required rapid prototyping of the UI, and I found myself using <a href="http://placehold.it">placeholder images</a> in many places.</p>
+<p><img src="http://i.imgur.com/sivh5Fe.jpg"></img></p>
 
-<pre><code class="language-html">&lt;img src=&quot;http://placehold.it/350x150&quot;&gt;&lt;/img&gt;
+<blockquote>
+<p>&ldquo;A countdown of victims that will end at midnight unless our dear Dark Knight stops me first!&rdquo;
+- <strong>Joker</strong> in <a href="http://www.imdb.com/title/tt0519694/"><em>Holiday Knights</em></a></p>
+</blockquote>
+
+<p>Imagine you need to know the number of seconds from now until midnight. It could help Batman save Gotham. It could also help a web developer (like me) cache some data in Redis that should self-destruct at the end of the day. How would you do it?</p>
+
+<h3 id="my-solution">My Solution</h3>
+
+<p>As always, I turn to Python. But it doesn&rsquo;t solve my problem instantly. Python has many ways to deal with date math &ndash; should I use <a href="https://docs.python.org/3/library/datetime.html#datetime-objects">datetime</a>? <a href="https://docs.python.org/3/library/datetime.html#date-objects">date</a>? <a href="https://docs.python.org/3/library/datetime.html#time-objects">time</a>? <a href="https://docs.python.org/3/library/datetime.html#timedelta-objects">timedelta</a>? An external library like <a href="https://dateutil.readthedocs.io/en/stable/">dateutil</a>?</p>
+
+<p>Well, for best readability, I decided on a mixture that is pure Python with no external modules:</p>
+
+<pre><code class="language-python">from datetime import datetime, timedelta
+
+def how_many_seconds_until_midnight():
+    &quot;&quot;&quot;Get the number of seconds until midnight.&quot;&quot;&quot;
+    tomorrow = datetime.now() + timedelta(1)
+    midnight = datetime(year=tomorrow.year, month=tomorrow.month, 
+                        day=tomorrow.day, hour=0, minute=0, second=0)
+    return (midnight - datetime.now()).seconds
 </code></pre>
 
-<h3 id="a-custom-tag">A Custom Tag</h3>
+<p>Or, if you want to remove the timedelta dependency and just use math:</p>
 
-<pre><code class="language-python"># project/app/templatetags/webextras.py
-from django import template
+<pre><code class="language-python">from datetime import datetime
 
-register = template.Library()
-
-@register.simple_tag
-def fake_img(width, height):
-    return 'https://placehold.it/{}x{}'.format(width, height)
-</code></pre>
-
-<p>For more info on custom tags, read the <a href="https://docs.djangoproject.com/en/1.8/howto/custom-template-tags/">Django docs</a>.</p>
-
-<p>Now, to use the new tag in my templates:</p>
-
-<pre><code class="language-html">&lt;!-- At top of template --&gt;
-{% load fake_img from webextras %}
-
-&lt;!-- ... --&gt;
-
-&lt;img src=&quot;{% fake_img 350 150 %}&quot;&gt;&lt;/img&gt;
-&lt;!-- Easily replaced with a static method call later. --&gt;
-&lt;img src=&quot;{% static 'logo.png' %}&quot;&gt;&lt;/img&gt;
+def how_many_seconds_until_midnight():
+    &quot;&quot;&quot;Get the number of seconds until midnight.&quot;&quot;&quot;
+    n = datetime.now()
+    return ((24 - n.hour - 1) * 60 * 60) + ((60 - n.minute - 1) * 60) + (60 - n.second)
 </code></pre>
 
     </article>

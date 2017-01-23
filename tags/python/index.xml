@@ -2,12 +2,58 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Python on /dev/jacob</title>
-    <link>http://jacobbridges.github.io/tags/python/</link>
+    <link>http://jacobbridges.github.io/tags/python/index.xml</link>
     <description>Recent content in Python on /dev/jacob</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 20 May 2016 21:03:05 -0400</lastBuildDate>
     <atom:link href="http://jacobbridges.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>how many seconds until midnight?</title>
+      <link>http://jacobbridges.github.io/post/how-many-seconds-until-midnight/</link>
+      <pubDate>Sun, 22 Jan 2017 21:19:31 -0600</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/how-many-seconds-until-midnight/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/sivh5Fe.jpg&#34;&gt;&lt;/img&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;A countdown of victims that will end at midnight unless our dear Dark Knight stops me first!&amp;rdquo;
+- &lt;strong&gt;Joker&lt;/strong&gt; in &lt;a href=&#34;http://www.imdb.com/title/tt0519694/&#34;&gt;&lt;em&gt;Holiday Knights&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Imagine you need to know the number of seconds from now until midnight. It could help Batman save Gotham. It could also help a web developer (like me) cache some data in Redis that should self-destruct at the end of the day. How would you do it?&lt;/p&gt;
+
+&lt;h3 id=&#34;my-solution&#34;&gt;My Solution&lt;/h3&gt;
+
+&lt;p&gt;As always, I turn to Python. But it doesn&amp;rsquo;t solve my problem instantly. Python has many ways to deal with date math &amp;ndash; should I use &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#datetime-objects&#34;&gt;datetime&lt;/a&gt;? &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#date-objects&#34;&gt;date&lt;/a&gt;? &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#time-objects&#34;&gt;time&lt;/a&gt;? &lt;a href=&#34;https://docs.python.org/3/library/datetime.html#timedelta-objects&#34;&gt;timedelta&lt;/a&gt;? An external library like &lt;a href=&#34;https://dateutil.readthedocs.io/en/stable/&#34;&gt;dateutil&lt;/a&gt;?&lt;/p&gt;
+
+&lt;p&gt;Well, for best readability, I decided on a mixture that is pure Python with no external modules:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from datetime import datetime, timedelta
+
+def how_many_seconds_until_midnight():
+    &amp;quot;&amp;quot;&amp;quot;Get the number of seconds until midnight.&amp;quot;&amp;quot;&amp;quot;
+    tomorrow = datetime.now() + timedelta(1)
+    midnight = datetime(year=tomorrow.year, month=tomorrow.month, 
+                        day=tomorrow.day, hour=0, minute=0, second=0)
+    return (midnight - datetime.now()).seconds
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Or, if you want to remove the timedelta dependency and just use math:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from datetime import datetime
+
+def how_many_seconds_until_midnight():
+    &amp;quot;&amp;quot;&amp;quot;Get the number of seconds until midnight.&amp;quot;&amp;quot;&amp;quot;
+    n = datetime.now()
+    return ((24 - n.hour - 1) * 60 * 60) + ((60 - n.minute - 1) * 60) + (60 - n.second)
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>django tag for placeholder.it</title>
@@ -17,14 +63,14 @@
       <guid>http://jacobbridges.github.io/post/custom-django-tag-placeholder-images/</guid>
       <description>
 
-&lt;h3 id=&#34;the-problem:16fdfe957b9f77d5d8be427e73689e99&#34;&gt;The Problem&lt;/h3&gt;
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
 
 &lt;p&gt;In the past few weeks I have been using Django to build a website for my local church. The project&amp;rsquo;s early conception required rapid prototyping of the UI, and I found myself using &lt;a href=&#34;http://placehold.it&#34;&gt;placeholder images&lt;/a&gt; in many places.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;img src=&amp;quot;http://placehold.it/350x150&amp;quot;&amp;gt;&amp;lt;/img&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h3 id=&#34;a-custom-tag:16fdfe957b9f77d5d8be427e73689e99&#34;&gt;A Custom Tag&lt;/h3&gt;
+&lt;h3 id=&#34;a-custom-tag&#34;&gt;A Custom Tag&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# project/app/templatetags/webextras.py
 from django import template
@@ -60,7 +106,7 @@ def fake_img(width, height):
       <guid>http://jacobbridges.github.io/post/web-scraping-threads-and-queues/</guid>
       <description>
 
-&lt;h3 id=&#34;the-problem:ac000825113187d0830002f6bb3abe5b&#34;&gt;The Problem&lt;/h3&gt;
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;urls = get_urls()  # len(urls) &amp;gt; 5000
 for url in urls:
@@ -74,7 +120,7 @@ for url in urls:
 
 &lt;p&gt;The problem is that code will take almost 4 hours to complete. By continuing to publish code like this, we are furthering the stereotype that Python is slow. By using a few extra lines of code, I will show you how to take that 4 hours and cut it down to less than 5 minutes.&lt;/p&gt;
 
-&lt;h3 id=&#34;thread-it:ac000825113187d0830002f6bb3abe5b&#34;&gt;Thread It&lt;/h3&gt;
+&lt;h3 id=&#34;thread-it&#34;&gt;Thread It&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from threading import Thread
 &lt;/code&gt;&lt;/pre&gt;
@@ -105,7 +151,7 @@ for i in range(5):
 
 &lt;p&gt;One common way to fix this problem is by slicing the url list into chunks and feeding a different chunk to each worker. The workers will effectively scrape all the pages in &lt;sup&gt;1&lt;/sup&gt;&amp;frasl;&lt;sub&gt;5&lt;/sub&gt; the original time&amp;ndash;but there is a better way. A more efficient way.&lt;/p&gt;
 
-&lt;h3 id=&#34;queue-it:ac000825113187d0830002f6bb3abe5b&#34;&gt;Queue It&lt;/h3&gt;
+&lt;h3 id=&#34;queue-it&#34;&gt;Queue It&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from Queue import Queue
 &lt;/code&gt;&lt;/pre&gt;
@@ -136,7 +182,7 @@ q.join()
 
 &lt;p&gt;&lt;strong&gt;Important!&lt;/strong&gt; The &lt;code&gt;q.join&lt;/code&gt; on the last line is very important. It causes the program to wait for the queue to be emptied before exiting.&lt;/p&gt;
 
-&lt;h3 id=&#34;results:ac000825113187d0830002f6bb3abe5b&#34;&gt;Results&lt;/h3&gt;
+&lt;h3 id=&#34;results&#34;&gt;Results&lt;/h3&gt;
 
 &lt;p&gt;Comparing results is mind blowing. The linear (n00b) scraping method takes over an hour to scrape 5000 pages, and the threaded + queues method takes &lt;em&gt;less than three minutes&lt;/em&gt;. *&lt;/p&gt;
 
@@ -148,15 +194,15 @@ q.join()
 
 &lt;hr /&gt;
 
-&lt;h3 id=&#34;external-references:ac000825113187d0830002f6bb3abe5b&#34;&gt;External References&lt;/h3&gt;
+&lt;h3 id=&#34;external-references&#34;&gt;External References&lt;/h3&gt;
 
-&lt;h4 id=&#34;threading:ac000825113187d0830002f6bb3abe5b&#34;&gt;Threading&lt;/h4&gt;
+&lt;h4 id=&#34;threading&#34;&gt;Threading&lt;/h4&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://pymotw.com/2/threading/&#34;&gt;PyMOTW threading&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://lonelycode.com/2011/02/04/python-threading-and-queues-and-why-its-awesome/&#34;&gt;Python Threading and Queues - and why its awesome&lt;/a&gt;&lt;/p&gt;
 
-&lt;h4 id=&#34;queues:ac000825113187d0830002f6bb3abe5b&#34;&gt;Queues&lt;/h4&gt;
+&lt;h4 id=&#34;queues&#34;&gt;Queues&lt;/h4&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://pymotw.com/2/Queue/&#34;&gt;PyMOTW queues&lt;/a&gt;&lt;/p&gt;
 </description>

@@ -76,7 +76,7 @@
     <article>
       
 
-<h3 id="the-problem:ac000825113187d0830002f6bb3abe5b">The Problem</h3>
+<h3 id="the-problem">The Problem</h3>
 
 <pre><code class="language-python">urls = get_urls()  # len(urls) &gt; 5000
 for url in urls:
@@ -90,7 +90,7 @@ for url in urls:
 
 <p>The problem is that code will take almost 4 hours to complete. By continuing to publish code like this, we are furthering the stereotype that Python is slow. By using a few extra lines of code, I will show you how to take that 4 hours and cut it down to less than 5 minutes.</p>
 
-<h3 id="thread-it:ac000825113187d0830002f6bb3abe5b">Thread It</h3>
+<h3 id="thread-it">Thread It</h3>
 
 <pre><code class="language-python">from threading import Thread
 </code></pre>
@@ -121,7 +121,7 @@ for i in range(5):
 
 <p>One common way to fix this problem is by slicing the url list into chunks and feeding a different chunk to each worker. The workers will effectively scrape all the pages in <sup>1</sup>&frasl;<sub>5</sub> the original time&ndash;but there is a better way. A more efficient way.</p>
 
-<h3 id="queue-it:ac000825113187d0830002f6bb3abe5b">Queue It</h3>
+<h3 id="queue-it">Queue It</h3>
 
 <pre><code class="language-python">from Queue import Queue
 </code></pre>
@@ -152,7 +152,7 @@ q.join()
 
 <p><strong>Important!</strong> The <code>q.join</code> on the last line is very important. It causes the program to wait for the queue to be emptied before exiting.</p>
 
-<h3 id="results:ac000825113187d0830002f6bb3abe5b">Results</h3>
+<h3 id="results">Results</h3>
 
 <p>Comparing results is mind blowing. The linear (n00b) scraping method takes over an hour to scrape 5000 pages, and the threaded + queues method takes <em>less than three minutes</em>. *</p>
 
@@ -164,15 +164,15 @@ q.join()
 
 <hr />
 
-<h3 id="external-references:ac000825113187d0830002f6bb3abe5b">External References</h3>
+<h3 id="external-references">External References</h3>
 
-<h4 id="threading:ac000825113187d0830002f6bb3abe5b">Threading</h4>
+<h4 id="threading">Threading</h4>
 
 <p><a href="http://pymotw.com/2/threading/">PyMOTW threading</a></p>
 
 <p><a href="http://lonelycode.com/2011/02/04/python-threading-and-queues-and-why-its-awesome/">Python Threading and Queues - and why its awesome</a></p>
 
-<h4 id="queues:ac000825113187d0830002f6bb3abe5b">Queues</h4>
+<h4 id="queues">Queues</h4>
 
 <p><a href="http://pymotw.com/2/Queue/">PyMOTW queues</a></p>
 

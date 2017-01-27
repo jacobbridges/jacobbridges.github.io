@@ -61,10 +61,11 @@ class TestPersonClass(TestCase):
             # Stub the database cursor
             database_cursor = MagicMock()
 
-            # Create a future to stub the results from the database cursor
-            result_future = asyncio.Future()
-            result_future.set_result(&#39;future result!&#39;)
-            database_cursor.execute.return_value = result_future
+            # Stub the execute function with mocked results from the database
+            execute_stub = MagicMock(return_value=&#39;future result!&#39;)
+            # Wrap the stub in a coroutine (so it can be awaited)
+            execute_coro = asyncio.coroutine(execute_stub)
+            database_cursor.execute = execute_coro
 
             # Instantiate new person obj
             person = PersonClass(name=&#39;Johnny&#39;, cursor=database_cursor)
@@ -75,7 +76,7 @@ class TestPersonClass(TestCase):
             # Assert the response from person.create() is our predefined future
             assert person_create_response == &#39;future result!&#39;
             # Assert the database cursor was called once
-            database_cursor.execute.assert_called_once_with(person.insert_sql, (&#39;Johnny&#39;,))
+            execute_stub.assert_called_once_with(person.insert_sql, (&#39;Johnny&#39;,))
 
         # Run the async test
         coro = asyncio.coroutine(run_test)
@@ -109,10 +110,11 @@ class TestPersonClass(object):
         # Stub the database cursor
         database_cursor = MagicMock()
 
-        # Create a future to stub the results from the database cursor
-        result_future = asyncio.Future()
-        result_future.set_result(&#39;future result!&#39;)
-        database_cursor.execute.return_value = result_future
+        # Stub the execute function with mocked results from the database
+        execute_stub = MagicMock(return_value=&#39;future result!&#39;)
+        # Wrap the stub in a coroutine (so it can be awaited)
+        execute_coro = asyncio.coroutine(execute_stub)
+        database_cursor.execute = execute_coro
 
         # Instantiate new person obj
         person = PersonClass(name=&#39;Johnny&#39;, cursor=database_cursor)
@@ -123,7 +125,7 @@ class TestPersonClass(object):
         # Assert the response from person.create() is our predefined future
         assert person_create_response == &#39;future result!&#39;
         # Assert the database cursor was called once
-        database_cursor.execute.assert_called_once_with(person.insert_sql, (&#39;Johnny&#39;,))
+        execute_stub.assert_called_once_with(person.insert_sql, (&#39;Johnny&#39;,))
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;This code is much cleaner, and resembles any other unit test in the project. No setting up event loops or managing coroutines. Just one decorator and we are gold.&lt;/p&gt;

@@ -86,8 +86,8 @@ class TestPersonClass(TestCase):
 
 &lt;ul&gt;
 &lt;li&gt;A new event loop should be created for every test, otherwise it could become a point of mutated state across multiple tests and cause strange issues.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;await&lt;/code&gt; can only be called from a function marked with &lt;code&gt;async&lt;/code&gt;, so a coroutine must be created inside the test function to await the function call.&lt;/li&gt;
-&lt;li&gt;Again, I cannot call &lt;code&gt;await&lt;/code&gt; in the test function so I transform the async function into a coroutine object that I can send directly to the event loop.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;await&lt;/code&gt; can only be called from a function marked with &lt;code&gt;async&lt;/code&gt;, so a coroutine must be created inside the test function to await the function call &lt;code&gt;person.create()&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Again, I cannot &lt;code&gt;await run_test()&lt;/code&gt; in the test function so I transform it into a coroutine object that I can send directly to the event loop.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&#34;with-pytest-mark-asyncio&#34;&gt;With &lt;code&gt;pytest.mark.asyncio&lt;/code&gt;&lt;/h3&gt;

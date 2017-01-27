@@ -6,8 +6,152 @@
     <description>Recent content in Posts on /dev/jacob</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 22 Jan 2017 21:19:31 -0600</lastBuildDate>
+    <lastBuildDate>Thu, 26 Jan 2017 00:28:12 -0600</lastBuildDate>
     <atom:link href="http://jacobbridges.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>unit testing with asyncio</title>
+      <link>http://jacobbridges.github.io/post/unit-testing-with-asyncio/</link>
+      <pubDate>Thu, 26 Jan 2017 00:28:12 -0600</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/unit-testing-with-asyncio/</guid>
+      <description>
+
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# One method on this class is an asyncio coroutine.
+class PersonClass(object):
+
+    def __init__(self, name=None, cursor=None):
+        &amp;quot;&amp;quot;&amp;quot;Constructor for PersonClass.&amp;quot;&amp;quot;&amp;quot;
+        self.name = name
+        self.cursor = cursor
+        self.insert_sql = &#39;INSERT INTO person VALUES ?;&#39;
+
+    async def create(self):  # ....HOW TO TEST THIS METHOD??
+        &amp;quot;&amp;quot;&amp;quot;Persist the person to the database.&amp;quot;&amp;quot;&amp;quot;
+        return await self.cursor.execute(self.insert_sql, (self.name,))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Testing and even stubbing asyncio code can be confusing. And frustrating. I spent an embarrassing four hours yesterday trying to unit test my async/await code. After much googling (and screaming) I discovered two methods that are both neat and clean.&lt;/p&gt;
+
+&lt;h3 id=&#34;my-environment&#34;&gt;My Environment&lt;/h3&gt;
+
+&lt;p&gt;Inspiration for writing this article comes from my project &lt;a href=&#34;https://github.com/jacobbridges/veggiecron-server&#34;&gt;veggiecron-server&lt;/a&gt;, which is written with async/await syntax from Python 3.5 and 3.6. For testing I am using &lt;a href=&#34;http://doc.pytest.org/en/latest/&#34;&gt;pytest&lt;/a&gt; as the test runner and &lt;a href=&#34;https://docs.python.org/3/library/unittest.mock.html#magicmock-and-magic-method-support&#34;&gt;MagicMock&lt;/a&gt; for stubbing. I also highly recommend the pytest plugin &lt;a href=&#34;https://github.com/pytest-dev/pytest-asyncio&#34;&gt;pytest-asyncio&lt;/a&gt; which reduces the event loop boilerplate code needed for each asynchronous test.&lt;/p&gt;
+
+&lt;h3 id=&#34;with-unittest-testclass&#34;&gt;With &lt;code&gt;unittest.TestClass&lt;/code&gt;&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import asyncio
+
+from unittest import TestCase
+from unittest.mock import MagicMock
+
+from src.person import PersonClass
+
+class TestPersonClass(TestCase):
+
+    def test_send_query_on_create(self):
+        &amp;quot;&amp;quot;&amp;quot;Should send insert query to database on create()&amp;quot;&amp;quot;&amp;quot;
+
+        event_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(event_loop)
+
+        async def run_test():
+
+            # Stub the database cursor
+            database_cursor = MagicMock()
+
+            # Create a future to stub the results from the database cursor
+            result_future = asyncio.Future()
+            result_future.set_result(&#39;future result!&#39;)
+            database_cursor.execute.return_value = result_future
+
+            # Instantiate new person obj
+            person = PersonClass(name=&#39;Johnny&#39;, cursor=database_cursor)
+
+            # Call person.create() to trigger the database call
+            person_create_response = await person.create()
+
+            # Assert the response from person.create() is our predefined future
+            assert person_create_response == &#39;future result!&#39;
+            # Assert the database cursor was called once
+            database_cursor.execute.assert_called_once_with(person.insert_sql, (&#39;Johnny&#39;,))
+
+        # Run the async test
+        coro = asyncio.coroutine(run_test)
+        event_loop.run_until_complete(coro())
+        event_loop.close()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is one of the simplest ways to test asynchronous code without external dependencies. What is going on here:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A new event loop should be created for every test, otherwise it could become a point of mutated state across multiple tests and cause strange issues.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;await&lt;/code&gt; can only be called from a function marked with &lt;code&gt;async&lt;/code&gt;, so a coroutine must be created inside the test function to await the function call.&lt;/li&gt;
+&lt;li&gt;Again, I cannot call &lt;code&gt;await&lt;/code&gt; in the test function so I transform the async function into a coroutine object that I can send directly to the event loop.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;with-pytest-mark-asyncio&#34;&gt;With &lt;code&gt;pytest.mark.asyncio&lt;/code&gt;&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import asyncio
+import pytest
+
+from unittest.mock import MagicMock
+
+from my_code import PersonClass
+
+class TestPersonClass(object):
+
+    @pytest.mark.asyncio
+    async def test_send_query_on_create(self):
+        &amp;quot;&amp;quot;&amp;quot;Should send insert query to database on create()&amp;quot;&amp;quot;&amp;quot;
+
+        # Stub the database cursor
+        database_cursor = MagicMock()
+
+        # Create a future to stub the results from the database cursor
+        result_future = asyncio.Future()
+        result_future.set_result(&#39;future result!&#39;)
+        database_cursor.execute.return_value = result_future
+
+        # Instantiate new person obj
+        person = PersonClass(name=&#39;Johnny&#39;, cursor=database_cursor)
+
+        # Call person.create() to trigger the database call
+        person_create_response = await person.create()
+
+        # Assert the response from person.create() is our predefined future
+        assert person_create_response == &#39;future result!&#39;
+        # Assert the database cursor was called once
+        database_cursor.execute.assert_called_once_with(person.insert_sql, (&#39;Johnny&#39;,))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This code is much cleaner, and resembles any other unit test in the project. No setting up event loops or managing coroutines. Just one decorator and we are gold.&lt;/p&gt;
+
+&lt;h4 id=&#34;important-danger-exterminate&#34;&gt;Important! Danger! EXTERMINATE!!&lt;/h4&gt;
+
+&lt;p&gt;Please take note in the above code that &lt;code&gt;TestPersonClass&lt;/code&gt; is &lt;strong&gt;not&lt;/strong&gt; a child class of &lt;code&gt;unittest.TestCase&lt;/code&gt;. If it was, the test would still succeed &amp;ndash; but the success would be a false positive because code after the &lt;code&gt;await&lt;/code&gt; expression would not run.&lt;/p&gt;
+
+&lt;p&gt;Why is this happening? The answer is complex enough that it deserves a separate post, but the tl;dr version is that on &lt;a href=&#34;https://github.com/pytest-dev/pytest-asyncio/blob/master/pytest_asyncio/plugin.py#L93&#34;&gt;line 93&lt;/a&gt; of pytest-asyncio&amp;rsquo;s &lt;a href=&#34;https://github.com/pytest-dev/pytest-asyncio&#34;&gt;source&lt;/a&gt; the author is expecting the event loop to be passed into the test from a pytest &lt;a href=&#34;http://doc.pytest.org/en/latest/fixture.html&#34;&gt;fixture&lt;/a&gt;, while &lt;code&gt;unittest.TestCase&lt;/code&gt; methods cannot directly receive fixture function arguments. Whew.&lt;/p&gt;
+
+&lt;h2 id=&#34;external-references&#34;&gt;External References&lt;/h2&gt;
+
+&lt;h4 id=&#34;articles&#34;&gt;Articles&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://stefan.sofa-rockers.org/2016/03/10/advanced-asyncio-testing/&#34;&gt;Stefan Scherfke - Advanced asyncio testing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://stackoverflow.com/questions/23033939/how-to-test-python-3-4-asyncio-code&#34;&gt;StackOverflow - How to test Python 3.4 asyncio code?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;docs&#34;&gt;Docs&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://doc.pytest.org/en/latest/contents.html#toc&#34;&gt;pytest docs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://pypi.python.org/pypi/pytest-asyncio&#34;&gt;pytest-asyncio (pytest plugin)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.python.org/3/library/unittest.html&#34;&gt;Python unittest module&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>how many seconds until midnight?</title>

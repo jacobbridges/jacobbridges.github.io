@@ -9,6 +9,214 @@
     <atom:link href="http://jacobbridges.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>jupyter notebook with interactive charts</title>
+      <link>http://jacobbridges.github.io/post/jupyter-notebook-with-interactive-charts/</link>
+      <pubDate>Mon, 30 Jan 2017 11:06:01 -0600</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/jupyter-notebook-with-interactive-charts/</guid>
+      <description>
+
+&lt;script src=&#34;https://code.highcharts.com/highcharts.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;https://code.highcharts.com/modules/exporting.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;https://code.jquery.com/jquery-3.1.1.min.js&#34;&gt;&lt;/script&gt;
+
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;I want beautiful, interactive charts in my Jupyter notebook.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Just yesterday I was playing with some data in a Jupyter notebook and making some charts with matplotlib when this thought came to me: &amp;ldquo;Wouldn&amp;rsquo;t it be nice if I could generate interactieve charts in my notebook? Like those beautiful Javascript charts you see on every admin template..&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;It is possible. Let me show you a whole new beautiful world!&lt;/p&gt;
+
+&lt;h3 id=&#34;highcharts&#34;&gt;Highcharts&lt;/h3&gt;
+
+&lt;p&gt;Highcharts is a Javascript library that makes attractive, interactive charts from minimal code. Example:&lt;/p&gt;
+
+&lt;div id=&#34;container&#34; style=&#34;min-width: 310px; height: 400px; margin: 0 auto&#34;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+$(function () {
+    Highcharts.chart(&#39;container&#39;, {
+        title: {
+            text: &#39;Monthly Average Temperature&#39;,
+            x: -20 //center
+        },
+        subtitle: {
+            text: &#39;Source: WorldClimate.com&#39;,
+            x: -20
+        },
+        xAxis: {
+            categories: [&#39;Jan&#39;, &#39;Feb&#39;, &#39;Mar&#39;, &#39;Apr&#39;, &#39;May&#39;, &#39;Jun&#39;,
+                &#39;Jul&#39;, &#39;Aug&#39;, &#39;Sep&#39;, &#39;Oct&#39;, &#39;Nov&#39;, &#39;Dec&#39;]
+        },
+        yAxis: {
+            title: {
+                text: &#39;Temperature (°C)&#39;
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: &#39;#808080&#39;
+            }]
+        },
+        tooltip: {
+            valueSuffix: &#39;°C&#39;
+        },
+        legend: {
+            layout: &#39;vertical&#39;,
+            align: &#39;right&#39;,
+            verticalAlign: &#39;middle&#39;,
+            borderWidth: 0
+        },
+        series: [{
+            name: &#39;Tokyo&#39;,
+            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+        }, {
+            name: &#39;New York&#39;,
+            data: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
+        }, {
+            name: &#39;Berlin&#39;,
+            data: [-0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0]
+        }, {
+            name: &#39;London&#39;,
+            data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+        }]
+    });
+});
+&lt;/script&gt;
+
+&lt;p&gt;Isn&amp;rsquo;t it great? Animations, tooltips on mouse hover, and exporting to image are just a few features of this great library. Its only dependency is jQuery which Jupyter loads by default. The chart above is Highchart&amp;rsquo;s &lt;a href=&#34;http://jsfiddle.net/gh/get/jquery/3.1.1/highslide-software/highcharts.com/tree/master/samples/highcharts/demo/line-basic/&#34;&gt;Line Chart&lt;/a&gt; example which is the same chart I will be creating in my Jupyter notebook.&lt;/p&gt;
+
+&lt;h3 id=&#34;jupyter-and-js&#34;&gt;Jupyter and JS&lt;/h3&gt;
+
+&lt;p&gt;Jupyter uses &lt;a href=&#34;http://requirejs.org/&#34;&gt;requirejs&lt;/a&gt; to manage its Javascript libraries, which means we can &amp;ldquo;require&amp;rdquo; Highcharts into the notebook by adding the following code into a cell:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;%%javascript
+require.config({
+  paths: {
+    highcharts: &amp;quot;http://code.highcharts.com/highcharts&amp;quot;,
+    highcharts_exports: &amp;quot;http://code.highcharts.com/modules/exporting&amp;quot;,
+  },
+  shim: {
+    highcharts: {
+      exports: &amp;quot;Highcharts&amp;quot;,
+      deps: [&amp;quot;jquery&amp;quot;]
+    },
+    highcharts_exports: {
+      exports: &amp;quot;Highcharts&amp;quot;,
+      deps: [&amp;quot;highcharts&amp;quot;]
+    }
+  }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since the Highcharts library does not expose itself according to the requirejs standard, I have made it into a shim. The feature to export charts as images is loaded from a separate module in the Highcharts &lt;a href=&#34;http://code.highcharts.com/&#34;&gt;source&lt;/a&gt;, so I had to load it as a separate shim and make the main library a dependency.&lt;/p&gt;
+
+&lt;h3 id=&#34;python-to-javascript&#34;&gt;Python to Javascript&lt;/h3&gt;
+
+&lt;p&gt;To translate the data from the Python realm into the Javascript realm felt a little &amp;ldquo;hacky&amp;rdquo;, so bear with me and include the following code in a new cell:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import json
+from IPython.display import Javascript
+
+chart_data = [
+  {
+    &#39;name&#39;: &#39;Tokyo&#39;,
+    &#39;data&#39;: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+  }, 
+  {
+    &#39;name&#39;: &#39;New York&#39;,
+    &#39;data&#39;: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
+  }, 
+  {
+    &#39;name&#39;: &#39;Berlin&#39;,
+    &#39;data&#39;: [-0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0]
+  }, 
+  {
+    &#39;name&#39;: &#39;London&#39;,
+    &#39;data&#39;: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+  }
+]
+
+Javascript(&amp;quot;window.chartData={};&amp;quot;.format(json.dumps(chart_data)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This takes the Python variable &lt;code&gt;chart_data&lt;/code&gt; and binds it to Javascript&amp;rsquo;s global &lt;code&gt;window&lt;/code&gt; variable as &lt;code&gt;window.chartData&lt;/code&gt;. This feels hacky &amp;ndash; manually loading Javascript and binding to a global &amp;ndash; but it works. If anyone has a prettier method please tweet me (&lt;a href=&#34;http://twitter.com/codeweavr&#34;&gt;@codeweavr&lt;/a&gt;) and I will edit this post with your recommendations.&lt;/p&gt;
+
+&lt;h1 id=&#34;the-graph&#34;&gt;The Graph&lt;/h1&gt;
+
+&lt;p&gt;To display the graph, I used the %%Javascript cell magic method and used the Highcharts demo code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;%%javascript
+// Since I append the div later, sometimes there are multiple divs.
+$(&amp;quot;#container&amp;quot;).remove();
+
+// Make the cdiv to contain the chart.
+element.append(&#39;&amp;lt;div id=&amp;quot;container&amp;quot; style=&amp;quot;min-width: 310px; height: 400px; margin: 0 auto&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;&#39;);
+
+// Require highcarts and make the chart.
+require([&#39;highcharts_exports&#39;], function(Highcharts) {
+    $(&#39;#container&#39;).highcharts({
+        title: {
+            text: &#39;Monthly Average Temperature&#39;,
+            x: -20 //center
+        },
+        subtitle: {
+            text: &#39;Source: WorldClimate.com&#39;,
+            x: -20
+        },
+        xAxis: {
+            categories: [&#39;Jan&#39;, &#39;Feb&#39;, &#39;Mar&#39;, &#39;Apr&#39;, &#39;May&#39;, &#39;Jun&#39;,
+                &#39;Jul&#39;, &#39;Aug&#39;, &#39;Sep&#39;, &#39;Oct&#39;, &#39;Nov&#39;, &#39;Dec&#39;]
+        },
+        yAxis: {
+            title: {
+                text: &#39;Temperature (°C)&#39;
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: &#39;#808080&#39;
+            }]
+        },
+        tooltip: {
+            valueSuffix: &#39;°C&#39;
+        },
+        legend: {
+            layout: &#39;vertical&#39;,
+            align: &#39;right&#39;,
+            verticalAlign: &#39;middle&#39;,
+            borderWidth: 0
+        },
+        // This is where I used the chart_data from Python
+        series: window.chartData
+    });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;external-references&#34;&gt;External References&lt;/h2&gt;
+
+&lt;p&gt;You can see my Juypter notebook as a &lt;a href=&#34;https://gist.github.com/jacobbridges/52b88708f9757ef799083528ebcf433b&#34;&gt;gist&lt;/a&gt; and as a &lt;a href=&#34;https://nbviewer.jupyter.org/urls/gist.githubusercontent.com/jacobbridges/52b88708f9757ef799083528ebcf433b/raw/2ba0d1405c204f3c9eb07664f65a9889d200c4c3/highcharts_example_with_jquery.ipynb&#34;&gt;rendered notebook&lt;/a&gt;. (The nbviewer project does not load all the libraries and css modules that Jupyter loads, so I had to include jquery as well in the require js cell. You may also notice the chart looks small or oddly shaped &amp;ndash; this won&amp;rsquo;t happen on your local instance of jupyter.)&lt;/p&gt;
+
+&lt;h4 id=&#34;articles&#34;&gt;Articles&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://stackoverflow.com/questions/8186027/loading-highcharts-with-require-js&#34;&gt;StackOverflow - Loading Highcharts with Requirejs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://blog.thedataincubator.com/2015/08/embedding-d3-in-an-ipython-notebook/&#34;&gt;The Data Incubator - Embedding d3.js in a iPython Notebook&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;docs&#34;&gt;Docs&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://jupyter.readthedocs.io/en/latest/&#34;&gt;Jupyter Docs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.highcharts.com/docs&#34;&gt;Highcharts Docs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>unit testing with asyncio</title>
       <link>http://jacobbridges.github.io/post/unit-testing-with-asyncio/</link>
       <pubDate>Thu, 26 Jan 2017 00:28:12 -0600</pubDate>

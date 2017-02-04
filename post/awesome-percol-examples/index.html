@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  
+  <meta charset="UTF-8">
+  <meta name="google-site-verification" content="CZ9oKTHo9Jp8Ke3sb1haDpjcTzLt-5Tk-Hon3gsFj-4" />
+  <title>
+    awesome percol examples | /dev/jacob
+  </title>
+
+
+  
+  <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
+
+
+  
+  <link rel="stylesheet" href="/css/sanitize.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/highlight_gist.css">
+  <link rel="stylesheet/less" href="/css/theme.less">
+  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+
+  
+  <script src="/js/less.js" type="text/javascript"></script>
+
+
+</head>
+
+
+
+<body>
+<div class="container">
+
+  
+  <header role="banner">
+    <div class="row gutters title-row">
+      <div id="site-title" class="col span_6">
+        <h1><a href="/">/dev/jacob</a></h1>
+        
+      </div>
+      <div id="social" class="col span_6">
+        <ul>
+          <li><a href="http://twitter.com/codeweavr" target="_blank"><i class="fa fa-twitter fa-2x"></i></a></li>
+          <li><a href="http://github.com/jacobbridges" target="_blank"><i class="fa fa-github fa-2x"></i></a></li>
+        </ul>
+      </div>
+    </div>
+
+    
+    <div class="row">
+      <div id="pages" class="col span_12">
+        <ul>
+          
+            <li><a href="/about">about</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </header>
+
+
+  
+  <main id="single" role="main">
+    <div class="article-header">
+      <h1>awesome percol examples</h1>
+      <div class="meta">
+        Feb 4, 2017 &nbsp;
+        (8 minute read) &nbsp;
+        
+          #<a href="/tags/bash">bash</a>&nbsp;
+        
+      </div>
+    </div>
+    <article>
+      
+
+<h3 id="what-is-percol">What is Percol?</h3>
+
+<p><a href="https://github.com/mooz/percol">Percol</a> is a Python utility for unix that adds an interactive selection menu to your terminal. This menu can be generated instantly just from piping from a different command.</p>
+
+<p>If I missed your favorite way of using percol, please <a href="https://twitter.com/intent/tweet?text=@codeweavr%20you%20forgot%20about%20this%20awesome%20way%20to%20use%20percol!">send me a tweet</a> and I&rsquo;ll add your suggestions to this list.</p>
+
+<h2 id="common-unix-stuff">Common UNIX Stuff</h2>
+
+<h4 id="search-a-file">Search a File</h4>
+
+<pre><code class="language-bash">percol /path/to/file
+</code></pre>
+
+<p><img src="http://i.imgur.com/BEblQTF.gif" alt="searching file with percol" /></p>
+
+<h4 id="changing-directories">Changing Directories</h4>
+
+<pre><code class="language-bash">cd $(ls -ARd */ | percol)
+</code></pre>
+
+<p><img src="http://i.imgur.com/OzjCYn1.gif" alt="changing directories with percol" /></p>
+
+<h4 id="killing-processes">Killing Processes</h4>
+
+<pre><code class="language-bash">ps aux | percol | awk '{ print $2 }' | xargs kill
+</code></pre>
+
+<p><img src="http://i.imgur.com/vOCCclR.gif" alt="killing processes with percol" /></p>
+
+<h4 id="run-a-command-from-history">Run a Command from History</h4>
+
+<pre><code class="language-bash">eval $(history | cut -c 8- | percol)
+</code></pre>
+
+<p><img src="http://i.imgur.com/QwBcygP.gif" alt="run history command with percol" /></p>
+
+<h4 id="search-grep-results">Search <code>grep</code> Results</h4>
+
+<pre><code class="language-bash">grep -R &quot;needle&quot; haystack/ 
+</code></pre>
+
+<p><img src="http://i.imgur.com/M5tFS2o.gif" alt="search grep results with percol" /></p>
+
+<h4 id="open-grep-result-file-with-vim">Open <code>grep</code> Result File with <code>vim</code></h4>
+
+<pre><code class="language-bash">vim $(grep -R 'needle' haystack/ | percol | awk -F ':' '{print $1}')
+</code></pre>
+
+<p><img src="http://i.imgur.com/yaUuuVS.gif" alt="open grep result in vim with percol" /></p>
+
+<h4 id="parsing-diff-output">Parsing <code>diff</code> Output</h4>
+
+<pre><code class="language-bash">diff file1 file2 | percol
+</code></pre>
+
+<p><img src="http://i.imgur.com/sqd3002.gif" alt="parsing diff output with percol" /></p>
+
+<h4 id="search-for-alias">Search for <code>alias</code></h4>
+
+<pre><code class="language-bash">alias | percol
+</code></pre>
+
+<p><img src="http://i.imgur.com/BeIHha1.gif" alt="search for alias with percol" /></p>
+
+<h4 id="choose-user-for-file-ownership">Choose User for File Ownership</h4>
+
+<pre><code class="language-bash">sudo chown $(cut -d: -f1 /etc/passwd | percol) file
+</code></pre>
+
+<p><img src="http://i.imgur.com/rINfo1Z.gif" alt="choose user for file ownership with percol" /></p>
+
+<h4 id="choose-group-for-file-ownership">Choose Group for File Ownership</h4>
+
+<pre><code class="language-bash">sudo chgrp $(groups | tr &quot; &quot; '\n' | percol) file
+</code></pre>
+
+<p><img src="http://i.imgur.com/cda2i1Y.gif" alt="choose group for file ownership with percol" /></p>
+
+<h2 id="percol-with-docker">Percol with Docker</h2>
+
+<h4 id="choose-running-container-to-stop">Choose Running Container to Stop</h4>
+
+<pre><code class="language-bash">docker stop $(docker ps | percol | awk '{print  $1;}')
+</code></pre>
+
+<p><img src="http://i.imgur.com/7libnKg.gif" alt="choose running container to stop with percol" /></p>
+
+<h4 id="choose-stopped-container-to-start">Choose Stopped Container to Start</h4>
+
+<pre><code class="language-bash">docker start $(docker ps --filter 'status=exited' | percol | awk '{print $1;}')
+</code></pre>
+
+<p><img src="http://i.imgur.com/iRR3urS.gif" alt="choose stopped container to start with percol" /></p>
+
+<h4 id="choose-container-to-remove">Choose Container to Remove</h4>
+
+<pre><code class="language-bash">docker rm $(docker ps -a | percol | awk '{print $1;}')
+</code></pre>
+
+<p><img src="http://i.imgur.com/4ZHVA0h.gif" alt="choose container to remove with percol" /></p>
+
+<h4 id="choose-image-to-remove">Choose Image to Remove</h4>
+
+<pre><code class="language-bash">docker rmi $(docker images | percol | awk '{print $3;}')
+</code></pre>
+
+<p><img src="http://i.imgur.com/UH2wOXQ.gif" alt="choose image to remove with percol" /></p>
+
+    </article>
+    
+
+
+<script type="text/javascript">
+     
+    var disqus_shortname = '';
+
+     
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+  </main>
+
+
+  
+  <footer role="contentinfo">
+    <div style="text-align:center;">
+      <img src="https://pbs.twimg.com/profile_images/549048966071865344/ozB8Xi12_400x400.png" width="64" height="64"><br>
+      
+    </div>
+  </footer>
+
+
+</div>
+
+<script src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-90904674-1', 'auto');
+	ga('send', 'pageview');
+</script>
+
+</body>
+</html>
+

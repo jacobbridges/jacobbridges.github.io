@@ -6,8 +6,126 @@
     <description>Recent content in Posts on /dev/jacob</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 30 Jan 2017 11:06:01 -0600</lastBuildDate>
+    <lastBuildDate>Sat, 04 Feb 2017 15:48:29 -0600</lastBuildDate>
     <atom:link href="http://jacobbridges.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>awesome percol examples</title>
+      <link>http://jacobbridges.github.io/post/awesome-percol-examples/</link>
+      <pubDate>Sat, 04 Feb 2017 15:48:29 -0600</pubDate>
+      
+      <guid>http://jacobbridges.github.io/post/awesome-percol-examples/</guid>
+      <description>
+
+&lt;h3 id=&#34;what-is-percol&#34;&gt;What is Percol?&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/mooz/percol&#34;&gt;Percol&lt;/a&gt; is a Python utility for unix that adds an interactive selection menu to your terminal. This menu can be generated instantly just from piping from a different command.&lt;/p&gt;
+
+&lt;p&gt;If I missed your favorite way of using percol, please &lt;a href=&#34;https://twitter.com/intent/tweet?text=@codeweavr%20you%20forgot%20about%20this%20awesome%20way%20to%20use%20percol!&#34;&gt;send me a tweet&lt;/a&gt; and I&amp;rsquo;ll add your suggestions to this list.&lt;/p&gt;
+
+&lt;h2 id=&#34;common-unix-stuff&#34;&gt;Common UNIX Stuff&lt;/h2&gt;
+
+&lt;h4 id=&#34;search-a-file&#34;&gt;Search a File&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;percol /path/to/file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/BEblQTF.gif&#34; alt=&#34;searching file with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;changing-directories&#34;&gt;Changing Directories&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;cd $(ls -ARd */ | percol)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/OzjCYn1.gif&#34; alt=&#34;changing directories with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;killing-processes&#34;&gt;Killing Processes&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;ps aux | percol | awk &#39;{ print $2 }&#39; | xargs kill
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/vOCCclR.gif&#34; alt=&#34;killing processes with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;run-a-command-from-history&#34;&gt;Run a Command from History&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;eval $(history | cut -c 8- | percol)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/QwBcygP.gif&#34; alt=&#34;run history command with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;search-grep-results&#34;&gt;Search &lt;code&gt;grep&lt;/code&gt; Results&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;grep -R &amp;quot;needle&amp;quot; haystack/ 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/M5tFS2o.gif&#34; alt=&#34;search grep results with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;open-grep-result-file-with-vim&#34;&gt;Open &lt;code&gt;grep&lt;/code&gt; Result File with &lt;code&gt;vim&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;vim $(grep -R &#39;needle&#39; haystack/ | percol | awk -F &#39;:&#39; &#39;{print $1}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/yaUuuVS.gif&#34; alt=&#34;open grep result in vim with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;parsing-diff-output&#34;&gt;Parsing &lt;code&gt;diff&lt;/code&gt; Output&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;diff file1 file2 | percol
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/sqd3002.gif&#34; alt=&#34;parsing diff output with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;search-for-alias&#34;&gt;Search for &lt;code&gt;alias&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;alias | percol
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/BeIHha1.gif&#34; alt=&#34;search for alias with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;choose-user-for-file-ownership&#34;&gt;Choose User for File Ownership&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;sudo chown $(cut -d: -f1 /etc/passwd | percol) file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/rINfo1Z.gif&#34; alt=&#34;choose user for file ownership with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;choose-group-for-file-ownership&#34;&gt;Choose Group for File Ownership&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;sudo chgrp $(groups | tr &amp;quot; &amp;quot; &#39;\n&#39; | percol) file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/cda2i1Y.gif&#34; alt=&#34;choose group for file ownership with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;percol-with-docker&#34;&gt;Percol with Docker&lt;/h2&gt;
+
+&lt;h4 id=&#34;choose-running-container-to-stop&#34;&gt;Choose Running Container to Stop&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker stop $(docker ps | percol | awk &#39;{print  $1;}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/7libnKg.gif&#34; alt=&#34;choose running container to stop with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;choose-stopped-container-to-start&#34;&gt;Choose Stopped Container to Start&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker start $(docker ps --filter &#39;status=exited&#39; | percol | awk &#39;{print $1;}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/iRR3urS.gif&#34; alt=&#34;choose stopped container to start with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;choose-container-to-remove&#34;&gt;Choose Container to Remove&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker rm $(docker ps -a | percol | awk &#39;{print $1;}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/4ZHVA0h.gif&#34; alt=&#34;choose container to remove with percol&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;choose-image-to-remove&#34;&gt;Choose Image to Remove&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker rmi $(docker images | percol | awk &#39;{print $3;}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://i.imgur.com/UH2wOXQ.gif&#34; alt=&#34;choose image to remove with percol&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>jupyter notebook with interactive charts</title>
